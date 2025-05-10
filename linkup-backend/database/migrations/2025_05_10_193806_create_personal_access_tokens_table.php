@@ -4,8 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void
+class CreatePersonalAccessTokensTable extends Migration
+{
+    /**
+     * Ejecutar la migración (Crear la tabla).
+     */
+    public function up()
     {
         if (!Schema::hasTable('personal_access_tokens')) {
             Schema::create('personal_access_tokens', function (Blueprint $table) {
@@ -21,8 +25,11 @@ return new class extends Migration {
         }
     }
 
-    public function down(): void
+    /**
+     * Revertir la migración (Eliminar la tabla).
+     */
+    public function down()
     {
         Schema::dropIfExists('personal_access_tokens');
     }
-};
+}
