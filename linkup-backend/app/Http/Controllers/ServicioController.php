@@ -9,16 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class ServicioController extends Controller
 {
-    // Listar todos los servicios (público)
-    public function index()
-    {
-        return Servicio::with('empresa')->get();
-    }
-
-    // Mostrar los servicios de una empresa específica
+    // Listar servicios de una empresa específica (Público)
     public function show(Empresa $empresa)
     {
-        return $empresa->load('servicios');
+        return response()->json($empresa->load('servicios'));
     }
 
     // Crear un nuevo servicio (Solo empresas)

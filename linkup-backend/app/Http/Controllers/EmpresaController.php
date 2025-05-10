@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class EmpresaController extends Controller
 {
-    // Listar todas las empresas (públicas)
+    // Listar todas las empresas (público)
     public function index()
     {
         return Empresa::with('servicios')->get();
@@ -20,11 +20,15 @@ class EmpresaController extends Controller
         return response()->json($empresa->load('servicios'));
     }
 
-    // Crear una nueva empresa (Solo administradores)
+    // Crear una nueva empresa (Solo empresas)
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if ($user->rol !== 'empresa') {
+            return response()->json(['message' => 'Solo las empresas pueden registrarse.'], 403);
+        }
+
         $request->validate([
-            'usuario_id' => 'required|exists:usuarios,id',
             'nombre' => 'required|string|max:255',
             'sector' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
@@ -33,7 +37,7 @@ class EmpresaController extends Controller
         ]);
 
         $empresa = Empresa::create([
-            'usuario_id' => $request->usuario_id,
+            'usuario_id' => $user->id,
             'nombre' => $request->nombre,
             'sector' => $request->sector,
             'descripcion' => $request->descripcion,
@@ -41,14 +45,14 @@ class EmpresaController extends Controller
             'telefono' => $request->telefono,
         ]);
 
-        return response()->json(['message' => 'Empresa creada correctamente.', 'empresa' => $empresa]);
+        return response()->json(['message' => 'Empresa registrada correctamente.', 'empresa' => $empresa]);
     }
 
-    // Actualizar una empresa (Solo el propietario)
+    // Actualizar una empresa existente (Solo empresas)
     public function update(Request $request, Empresa $empresa)
     {
         $user = Auth::user();
-        if ($user->id !== $empresa->usuario_id) {
+        if ($user->rol !== 'empresa' || $user->id !== $empresa->usuario_id) {
             return response()->json(['message' => 'No tienes permiso para actualizar esta empresa.'], 403);
         }
 
@@ -71,11 +75,11 @@ class EmpresaController extends Controller
         return response()->json(['message' => 'Empresa actualizada correctamente.', 'empresa' => $empresa]);
     }
 
-    // Eliminar una empresa (Solo el propietario)
+    // Eliminar una empresa (Solo empresas)
     public function destroy(Empresa $empresa)
     {
         $user = Auth::user();
-        if ($user->id !== $empresa->usuario_id) {
+        if ($user->rol !== 'empresa' || $user->id !== $empresa->usuario_id) {
             return response()->json(['message' => 'No tienes permiso para eliminar esta empresa.'], 403);
         }
 

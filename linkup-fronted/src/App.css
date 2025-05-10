@@ -293,3 +293,49 @@ h2 {
 .cita-form button:hover {
     background: #5E239D;
 }
+
+/* Estilos de Formulario de Empresa */
+.empresa-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.empresa-form h2 {
+    text-align: center;
+    color: #4B0082;
+}
+
+.empresa-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.empresa-form label {
+    font-weight: bold;
+}
+
+.empresa-form input,
+.empresa-form textarea {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.empresa-form button {
+    padding: 0.5rem;
+    background: #4B0082;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.empresa-form button:hover {
+    background: #5E239D;
+}
