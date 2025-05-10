@@ -1,119 +1,93 @@
-import { useEffect, useState } from 'react';
-import api from './api';
+// src/CitaForm.jsx
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from './AuthContext';
+import axios from './api';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export default function CitaForm({ token }) {
-  const [empresas, setEmpresas] = useState([]);
-  const [empresaId, setEmpresaId] = useState('');
-  const [servicios, setServicios] = useState([]);
-  const [servicioId, setServicioId] = useState('');
-  const [fecha, setFecha] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [fechasOcupadas, setFechasOcupadas] = useState([]);
+export default function CitaForm() {
+    const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [empresas, setEmpresas] = useState([]);
+    const [servicios, setServicios] = useState([]);
+    const [empresaId, setEmpresaId] = useState(searchParams.get('empresa') || '');
+    const [servicioId, setServicioId] = useState(searchParams.get('servicio') || '');
+    const [fechaCita, setFechaCita] = useState('');
 
-  useEffect(() => {
-    const fetchEmpresas = async () => {
-      try {
-        const res = await api.get('/empresas');
-        setEmpresas(res.data);
-      } catch (err) {
-        console.error('Error al cargar empresas');
-      }
+    useEffect(() => {
+        loadEmpresas();
+        if (empresaId) {
+            loadServicios(empresaId);
+        }
+    }, [empresaId]);
+
+    const loadEmpresas = async () => {
+        try {
+            const res = await axios.get('/empresas');
+            setEmpresas(res.data);
+        } catch (error) {
+            console.error("Error al cargar empresas:", error);
+        }
     };
 
-    fetchEmpresas();
-  }, []);
-
-  const handleEmpresaChange = async (e) => {
-    const id = e.target.value;
-    setEmpresaId(id);
-    setServicioId('');
-    setServicios([]);
-    setFechasOcupadas([]);
-
-    try {
-      const [servRes, fechasRes] = await Promise.all([
-        api.get(`/empresas/${id}/servicios`),
-        api.get(`/empresa/${id}/fechas-ocupadas`)
-      ]);
-      setServicios(servRes.data);
-      setFechasOcupadas(fechasRes.data);
-    } catch (err) {
-      console.error('Error al cargar datos de empresa');
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await api.post('/citas', {
-        empresa_id: empresaId,
-        servicio_id: servicioId,
-        fecha_cita: fecha,
-        mensaje: mensaje
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
+    const loadServicios = async (id) => {
+        try {
+            const res = await axios.get(`/empresas/${id}`);
+            setServicios(res.data.servicios);
+        } catch (error) {
+            console.error("Error al cargar servicios:", error);
         }
-      });
+    };
 
-      setMensaje('Cita creada correctamente.');
-      setEmpresaId('');
-      setServicioId('');
-      setFecha('');
-      setMensaje('');
-    } catch (err) {
-      setMensaje('Error al crear cita.');
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.post('/citas', {
+                empresa_id: empresaId,
+                servicio_id: servicioId,
+                fecha_cita: fechaCita
+            });
+            alert("Cita reservada correctamente.");
+            navigate('/mis-citas');
+        } catch (error) {
+            console.error("Error al reservar cita:", error);
+        }
+    };
 
-  const isFechaOcupada = (f) => fechasOcupadas.includes(f);
+    return (
+        <div className="cita-form">
+            <h2>Reservar Cita</h2>
+            <form onSubmit={handleSubmit}>
+                <label>Empresa</label>
+                <select value={empresaId} onChange={(e) => setEmpresaId(e.target.value)} required>
+                    <option value="">Seleccionar empresa</option>
+                    {empresas.map((empresa) => (
+                        <option key={empresa.id} value={empresa.id}>
+                            {empresa.nombre}
+                        </option>
+                    ))}
+                </select>
 
-  return (
-    <div>
-      <h3>Solicitar cita</h3>
-      <form onSubmit={handleSubmit}>
-        <select value={empresaId} onChange={handleEmpresaChange}>
-          <option value="">Selecciona una empresa</option>
-          {empresas.map(e => (
-            <option key={e.id} value={e.id}>
-              {e.usuario?.nombre} ({e.sector})
-            </option>
-          ))}
-        </select>
+                <label>Servicio</label>
+                <select value={servicioId} onChange={(e) => setServicioId(e.target.value)} required>
+                    <option value="">Seleccionar servicio</option>
+                    {servicios.map((servicio) => (
+                        <option key={servicio.id} value={servicio.id}>
+                            {servicio.nombre} - ${servicio.precio}
+                        </option>
+                    ))}
+                </select>
 
-        <select value={servicioId} onChange={(e) => setServicioId(e.target.value)} disabled={!servicios.length}>
-          <option value="">Selecciona un servicio</option>
-          {servicios.map(s => (
-            <option key={s.id} value={s.id}>
-              {s.nombre} - {s.precio}€
-            </option>
-          ))}
-        </select>
+                <label>Fecha de la Cita</label>
+                <input
+                    type="date"
+                    value={fechaCita}
+                    onChange={(e) => setFechaCita(e.target.value)}
+                    required
+                />
 
-        <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          min={new Date().toISOString().split('T')[0]}
-          list="fechas-bloqueadas"
-        />
-
-        <datalist id="fechas-bloqueadas">
-          {fechasOcupadas.map((f, i) => (
-            <option key={i} value={f} disabled />
-          ))}
-        </datalist>
-
-        <textarea
-          placeholder="Mensaje (opcional)"
-          value={mensaje}
-          onChange={(e) => setMensaje(e.target.value)}
-        />
-
-        <button type="submit">Solicitar cita</button>
-      </form>
-
-      {mensaje && <p>{mensaje}</p>}
-    </div>
-  );
+                <button type="submit">Reservar</button>
+            </form>
+        </div>
+    );
 }

@@ -1,28 +1,25 @@
-import { useState } from 'react';
-import api from './api';
+// src/LoginForm.jsx
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-export default function LoginForm({ setToken }) {
-  const [data, setData] = useState({ email: '', password: '' });
+export default function LoginForm() {
+    const { login } = useContext(AuthContext);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await login(email, password);
+        navigate('/empresas');
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.post('/login', data);
-      setToken(res.data.token, res.data.usuario); // <-- pasamos token y usuario
-    } catch (err) {
-      alert('Login incorrecto');
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input name="email" placeholder="Email" onChange={handleChange} />
-      <input name="password" type="password" placeholder="Contraseña" onChange={handleChange} />
-      <button type="submit">Iniciar sesión</button>
-    </form>
-  );
+    return (
+        <form onSubmit={handleSubmit}>
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    );
 }

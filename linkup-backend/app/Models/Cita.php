@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cita extends Model
 {
-    protected $fillable = ['cliente_id', 'empresa_id', 'servicio_id', 'fecha_cita', 'estado', 'mensaje'];
+    protected $fillable = [
+        'cliente_id',
+        'empresa_id',
+        'servicio_id',
+        'fecha_cita',
+        'estado',
+        'mensaje'
+    ];
 
     public function cliente()
     {
@@ -22,5 +29,9 @@ class Cita extends Model
     {
         return $this->belongsTo(Servicio::class, 'servicio_id');
     }
-}
 
+    public function reseñas()
+    {
+        return $this->hasMany(Reseña::class, 'cita_id');
+    }
+}

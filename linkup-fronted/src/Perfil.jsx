@@ -1,73 +1,64 @@
-import { useState, useEffect } from 'react';
-import api from './api';
+// src/Perfil.jsx
+import React, { useContext, useState, useEffect } from 'react';
+import { AuthContext } from './AuthContext';
+import axios from './api';
+import { useNavigate } from 'react-router-dom';
 
-export default function Perfil({ token, setUsuario }) {
-  const [datos, setDatos] = useState({
-    nombre: '',
-    password: '',
-    password_confirmation: ''
-  });
-  const [mensaje, setMensaje] = useState('');
+export default function Perfil() {
+    const { user, logout } = useContext(AuthContext);
+    const [nombre, setNombre] = useState('');
+    const [email, setEmail] = useState('');
+    const [rol, setRol] = useState('');
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const cargarPerfil = async () => {
-      try {
-        const res = await api.get('/perfil', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setDatos({ ...datos, nombre: res.data.nombre });
-      } catch {
-        setMensaje('Error al cargar perfil');
-      }
+    useEffect(() => {
+        if (user) {
+            setNombre(user.nombre);
+            setEmail(user.email);
+            setRol(user.rol);
+        }
+    }, [user]);
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`/usuario`, { nombre, email });
+            alert("Perfil actualizado correctamente.");
+        } catch (error) {
+            console.error("Error al actualizar el perfil:", error);
+            alert("Hubo un problema al actualizar el perfil.");
+        }
     };
-    cargarPerfil();
-  }, []);
 
-  const handleChange = (e) => {
-    setDatos({ ...datos, [e.target.name]: e.target.value });
-  };
+    const handleDelete = async () => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar tu cuenta?")) {
+            try {
+                await axios.delete(`/usuario`);
+                await logout();
+                navigate('/register');
+            } catch (error) {
+                console.error("Error al eliminar el perfil:", error);
+                alert("Hubo un problema al eliminar tu cuenta.");
+            }
+        }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.put('/perfil', datos, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMensaje(res.data.message);
-      setUsuario(res.data.usuario);
-      setDatos({ ...datos, password: '', password_confirmation: '' });
-    } catch {
-      setMensaje('Error al actualizar perfil');
-    }
-  };
+    return (
+        <div className="perfil-container">
+            <h2>Perfil de Usuario</h2>
+            <form onSubmit={handleUpdate}>
+                <label>Nombre</label>
+                <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} />
 
-  return (
-    <div>
-      <h3>Mi perfil</h3>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nombre"
-          value={datos.nombre}
-          onChange={handleChange}
-          placeholder="Nombre"
-        />
-        <input
-          name="password"
-          type="password"
-          value={datos.password}
-          onChange={handleChange}
-          placeholder="Nueva contraseña (opcional)"
-        />
-        <input
-          name="password_confirmation"
-          type="password"
-          value={datos.password_confirmation}
-          onChange={handleChange}
-          placeholder="Confirmar contraseña"
-        />
-        <button type="submit">Actualizar perfil</button>
-      </form>
-      {mensaje && <p>{mensaje}</p>}
-    </div>
-  );
+                <label>Email</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+
+                <label>Rol</label>
+                <input type="text" value={rol} disabled />
+
+                <button type="submit">Actualizar Perfil</button>
+                <button type="button" onClick={handleDelete} className="delete-btn">Eliminar Cuenta</button>
+            </form>
+        </div>
+    );
 }

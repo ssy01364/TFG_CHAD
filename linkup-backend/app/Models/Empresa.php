@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empresa extends Model
 {
-    protected $fillable = ['usuario_id', 'nombre', 'descripcion', 'sector'];
+    protected $fillable = [
+        'usuario_id',
+        'sector',
+        'descripcion',
+        'ubicacion',
+        'telefono'
+    ];
 
     public function usuario()
     {
@@ -21,5 +27,10 @@ class Empresa extends Model
     public function citas()
     {
         return $this->hasMany(Cita::class);
+    }
+
+    public function reseñas()
+    {
+        return $this->hasMany(Reseña::class);
     }
 }

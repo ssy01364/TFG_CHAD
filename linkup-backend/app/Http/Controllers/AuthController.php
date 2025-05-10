@@ -2,86 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Usuario;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // REGISTRO
+    // Registro de Usuarios
     public function register(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:usuarios',
-            'password' => 'required|string|min:6',
-            'rol' => 'required|in:cliente,empresa',
+            'email' => 'required|email|unique:usuarios,email',
+            'password' => 'required|min:6',
+            'rol' => 'required|in:cliente,empresa'
         ]);
 
-        $usuario = Usuario::create([
+        $user = Usuario::create([
             'nombre' => $request->nombre,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
             'rol' => $request->rol,
         ]);
 
-        $token = $usuario->createToken('token')->plainTextToken;
-
-        return response()->json([
-            'usuario' => $usuario,
-            'token' => $token
-        ], 201);
+        return response()->json(['user' => $user, 'message' => 'Usuario registrado correctamente.'], 201);
     }
 
-    // LOGIN
+    // Inicio de sesión
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        $usuario = Usuario::where('email', $request->email)->first();
-
-        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
-            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Credenciales incorrectas.'], 401);
         }
 
-        $token = $usuario->createToken('token')->plainTextToken;
+        $user = Auth::user();
+        $token = $user->createToken('API Token')->plainTextToken;
 
-        return response()->json([
-            'usuario' => $usuario,
-            'token' => $token
-        ], 200);
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
-    // LOGOUT
-    public function logout(Request $request)
+    // Cierre de sesión
+    public function logout()
     {
-        $request->user()->tokens()->delete();
-
-        return response()->json(['message' => 'Sesión cerrada correctamente']);
+        Auth::user()->tokens()->delete();
+        return response()->json(['message' => 'Sesión cerrada correctamente.']);
     }
 
-    public function actualizarPerfil(Request $request)
-{
-    $user = $request->user();
+    // Actualizar perfil del usuario
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'email' => 'required|email|unique:usuarios,email,' . $user->id,
+        ]);
 
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'password' => 'nullable|string|min:6|confirmed',
-    ]);
+        $user->update([
+            'nombre' => $request->nombre,
+            'email' => $request->email,
+        ]);
 
-    $user->nombre = $request->nombre;
-
-    if ($request->filled('password')) {
-        $user->password = bcrypt($request->password);
+        return response()->json(['message' => 'Perfil actualizado correctamente.']);
     }
 
-    $user->save();
-
-    return response()->json(['usuario' => $user, 'message' => 'Perfil actualizado']);
-}
-
+    // Eliminar cuenta del usuario
+    public function deleteAccount()
+    {
+        $user = auth()->user();
+        $user->delete();
+        return response()->json(['message' => 'Cuenta eliminada correctamente.']);
+    }
 }

@@ -10,7 +10,12 @@ class Usuario extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
-    protected $fillable = ['nombre', 'email', 'password', 'rol'];
+    protected $fillable = [
+        'nombre',
+        'email',
+        'password',
+        'rol',
+    ];
 
     public function empresa()
     {
@@ -20,5 +25,10 @@ class Usuario extends Authenticatable
     public function citas()
     {
         return $this->hasMany(Cita::class, 'cliente_id');
+    }
+
+    public function reseñas()
+    {
+        return $this->hasMany(Reseña::class, 'cliente_id');
     }
 }
