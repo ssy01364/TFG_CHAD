@@ -13,6 +13,7 @@ import ReseñasEmpresa from './ReseñasEmpresa';
 import CitaForm from './CitaForm';
 import EmpresaForm from './EmpresaForm';
 import Navbar from './Navbar';
+import ProtectedRoute from './ProtectedRoute';
 
 export default function App() {
     return (
@@ -26,18 +27,20 @@ export default function App() {
                         <Route path="/register" element={<RegisterForm />} />
                         <Route path="/empresas" element={<EmpresasPublicas />} />
 
-                        {/* Rutas Protegidas para Empresas */}
-                        <Route path="/panel-empresa" element={<PanelEmpresa />} />
-                        <Route path="/empresa-form" element={<EmpresaForm />} />
-                        <Route path="/reseñas-empresa" element={<ReseñasEmpresa />} />
-
                         {/* Rutas Protegidas para Clientes */}
-                        <Route path="/perfil" element={<Perfil />} />
-                        <Route path="/mis-citas" element={<MisCitas />} />
-                        <Route path="/mis-reseñas" element={<ReseñasUsuario />} />
+                        <Route element={<ProtectedRoute role="cliente" />}>
+                            <Route path="/perfil" element={<Perfil />} />
+                            <Route path="/mis-citas" element={<MisCitas />} />
+                            <Route path="/mis-reseñas" element={<ReseñasUsuario />} />
+                            <Route path="/cita-form" element={<CitaForm />} />
+                        </Route>
 
-                        {/* Formulario de Citas (Clientes) */}
-                        <Route path="/cita-form" element={<CitaForm />} />
+                        {/* Rutas Protegidas para Empresas */}
+                        <Route element={<ProtectedRoute role="empresa" />}>
+                            <Route path="/panel-empresa" element={<PanelEmpresa />} />
+                            <Route path="/empresa-form" element={<EmpresaForm />} />
+                            <Route path="/reseñas-empresa" element={<ReseñasEmpresa />} />
+                        </Route>
                     </Routes>
                 </div>
             </Router>

@@ -4,10 +4,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
-}
-
-h2 {
-    color: #4B0082;
+    color: #333;
 }
 
 /* 🔧 Estilos del Navbar */
@@ -22,10 +19,11 @@ h2 {
 }
 
 .navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    width: 100%;
+    align-items: center;
 }
 
 .navbar-logo {
@@ -61,8 +59,22 @@ h2 {
     border-radius: 5px;
 }
 
-/* 🔧 Estilos del Perfil */
-.perfil-container {
+.logout-btn {
+    background: #E53E3E;
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: #C53030;
+}
+
+/* 🔧 Estilos del Formulario de Autenticación (Login y Registro) */
+.auth-form {
     max-width: 400px;
     margin: 2rem auto;
     padding: 1rem;
@@ -71,19 +83,25 @@ h2 {
     border-radius: 8px;
 }
 
-.perfil-container form {
+.auth-form h2 {
+    text-align: center;
+    color: #4B0082;
+}
+
+.auth-form form {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.perfil-container input {
+.auth-form input,
+.auth-form select {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.perfil-container button {
+.auth-form button {
     padding: 0.5rem;
     background: #4B0082;
     color: #fff;
@@ -93,16 +111,13 @@ h2 {
     transition: background 0.3s;
 }
 
-.perfil-container button:hover {
+.auth-form button:hover {
     background: #5E239D;
 }
 
-.perfil-container .delete-btn {
-    background: #E53E3E;
-}
-
-.perfil-container .delete-btn:hover {
-    background: #C53030;
+.auth-form p {
+    color: #E53E3E;
+    text-align: center;
 }
 
 /* 🔧 Estilos del Panel de Empresa */
@@ -124,7 +139,6 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-bottom: 1rem;
 }
 
 .panel-empresa input,
@@ -141,201 +155,8 @@ h2 {
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    transition: background 0.3s;
 }
 
 .panel-empresa button:hover {
-    background: #5E239D;
-}
-
-.panel-empresa .delete-btn {
-    background: #E53E3E;
-    margin-left: 0.5rem;
-}
-
-.panel-empresa .delete-btn:hover {
-    background: #C53030;
-}
-
-.servicios-lista {
-    list-style: none;
-    padding: 0;
-}
-
-.servicio-item {
-    background: #fff;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* 🔧 Estilos de Mis Citas */
-.mis-citas {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.mis-citas h2 {
-    text-align: center;
-    color: #4B0082;
-}
-
-.citas-lista {
-    list-style: none;
-    padding: 0;
-}
-
-.citas-lista li {
-    background: #fff;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-/* 🔧 Estilos de Reseñas */
-.reseñas-usuario, 
-.reseñas-empresa {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.reseñas-lista {
-    list-style: none;
-    padding: 0;
-}
-
-.reseña-item {
-    background: #fff;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.reseña-item strong {
-    color: #333;
-}
-
-.reseña-item small {
-    display: block;
-    margin-top: 0.25rem;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* 🔧 Estilos de Empresas Públicas */
-.empresas-publicas {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.empresas-publicas h2 {
-    text-align: center;
-    color: #4B0082;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* 🔧 Estilos de Formulario de Citas */
-.cita-form {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.cita-form label {
-    font-weight: bold;
-}
-
-.cita-form input,
-.cita-form select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.cita-form button {
-    padding: 0.5rem;
-    background: #4B0082;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s;
-}
-
-.cita-form button:hover {
-    background: #5E239D;
-}
-
-/* Estilos de Formulario de Empresa */
-.empresa-form {
-    max-width: 500px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.empresa-form h2 {
-    text-align: center;
-    color: #4B0082;
-}
-
-.empresa-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.empresa-form label {
-    font-weight: bold;
-}
-
-.empresa-form input,
-.empresa-form textarea {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.empresa-form button {
-    padding: 0.5rem;
-    background: #4B0082;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s;
-}
-
-.empresa-form button:hover {
     background: #5E239D;
 }

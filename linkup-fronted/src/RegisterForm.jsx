@@ -1,31 +1,70 @@
 // src/RegisterForm.jsx
-import React, { useState } from 'react';
-import axios from './api';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from './api';
 
 export default function RegisterForm() {
-    const [nombre, setNombre] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [rol, setRol] = useState('cliente');
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [form, setForm] = useState({
+        nombre: '',
+        email: '',
+        password: '',
+        rol: 'cliente' // Por defecto, rol de cliente
+    });
+    const [mensaje, setMensaje] = useState('');
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('/register', { nombre, email, password, rol });
-        navigate('/login');
+        try {
+            const res = await api.post('/register', form);
+            login(res.data.user, res.data.token);
+            navigate('/');
+        } catch (err) {
+            setMensaje('Error al registrarse');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <select value={rol} onChange={(e) => setRol(e.target.value)}>
-                <option value="cliente">Cliente</option>
-                <option value="empresa">Empresa</option>
-            </select>
-            <button type="submit">Registrarse</button>
-        </form>
+        <div className="auth-form">
+            <h2>Registro</h2>
+            <form onSubmit={handleSubmit}>
+                <input 
+                    type="text" 
+                    name="nombre" 
+                    placeholder="Nombre completo" 
+                    value={form.nombre} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="Correo electrónico" 
+                    value={form.email} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="password" 
+                    name="password" 
+                    placeholder="Contraseña" 
+                    value={form.password} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <select name="rol" value={form.rol} onChange={handleChange}>
+                    <option value="cliente">Cliente</option>
+                    <option value="empresa">Empresa</option>
+                </select>
+                <button type="submit">Registrarse</button>
+            </form>
+            {mensaje && <p>{mensaje}</p>}
+        </div>
     );
 }

@@ -6,6 +6,9 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
+    /**
+     * Middleware global que se ejecuta en todas las peticiones.
+     */
     protected $middleware = [
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\TrustProxies::class,
@@ -14,6 +17,9 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
+    /**
+     * Grupos de middleware aplicables a rutas específicas.
+     */
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
@@ -31,6 +37,9 @@ class Kernel extends HttpKernel
         ],
     ];
 
+    /**
+     * Middleware de ruta específicos (utilizables por nombre).
+     */
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -41,5 +50,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
+        // ✅ Middleware personalizado para roles (Cliente vs Empresa)
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
 }

@@ -3,11 +3,7 @@ import api from './api';
 
 export default function ReseñaForm({ token }) {
   const [citasAceptadas, setCitasAceptadas] = useState([]);
-  const [form, setForm] = useState({
-    cita_id: '',
-    puntuacion: 5,
-    comentario: ''
-  });
+  const [form, setForm] = useState({ cita_id: '', puntuacion: 5, comentario: '' });
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
@@ -16,14 +12,14 @@ export default function ReseñaForm({ token }) {
         const res = await api.get('/citas', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const disponibles = res.data.filter(c => c.estado === 'aceptada');
+        const disponibles = res.data.filter(c => c.estado === 'aceptada' && !c.reseña);
         setCitasAceptadas(disponibles);
       } catch (err) {
-        console.error('Error al cargar citas');
+        setMensaje('Error al cargar citas');
       }
     };
     fetchCitas();
-  }, []);
+  }, [token]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,7 +34,7 @@ export default function ReseñaForm({ token }) {
       setMensaje('¡Reseña enviada!');
       setForm({ cita_id: '', puntuacion: 5, comentario: '' });
     } catch (err) {
-      setMensaje('Error al enviar reseña');
+      setMensaje('Error al enviar reseña: ' + err.response?.data?.message || 'Desconocido');
     }
   };
 
@@ -46,7 +42,7 @@ export default function ReseñaForm({ token }) {
     <div>
       <h3>Valorar empresa</h3>
       <form onSubmit={handleSubmit}>
-        <select name="cita_id" value={form.cita_id} onChange={handleChange}>
+        <select name="cita_id" value={form.cita_id} onChange={handleChange} required>
           <option value="">Selecciona una cita aceptada</option>
           {citasAceptadas.map(c => (
             <option key={c.id} value={c.id}>
@@ -55,7 +51,7 @@ export default function ReseñaForm({ token }) {
           ))}
         </select>
 
-        <select name="puntuacion" value={form.puntuacion} onChange={handleChange}>
+        <select name="puntuacion" value={form.puntuacion} onChange={handleChange} required>
           {[1,2,3,4,5].map(p => (
             <option key={p} value={p}>{p} ⭐</option>
           ))}
@@ -66,6 +62,7 @@ export default function ReseñaForm({ token }) {
           placeholder="Comentario"
           value={form.comentario}
           onChange={handleChange}
+          required
         />
 
         <button type="submit">Enviar reseña</button>

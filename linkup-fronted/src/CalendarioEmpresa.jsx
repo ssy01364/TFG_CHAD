@@ -1,74 +1,96 @@
-import { useEffect, useState } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+// src/CalendarioEmpresa.jsx
+import React, { useState, useEffect, useContext } from 'react';
 import api from './api';
-import exportCSV from './utils/exportCSV';
+import { AuthContext } from './AuthContext';
 
 export default function CalendarioEmpresa({ token }) {
-  const [citas, setCitas] = useState([]);
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
+    const { user } = useContext(AuthContext);
+    const [citas, setCitas] = useState([]);
+    const [filtroFecha, setFiltroFecha] = useState('');
+    const [filtroServicio, setFiltroServicio] = useState('');
+    const [mensaje, setMensaje] = useState('');
 
-  useEffect(() => {
-    const fetchCitas = async () => {
-      try {
-        const res = await api.get('/citas', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCitas(res.data);
-      } catch (err) {
-        console.error('Error al cargar citas');
-      }
+    useEffect(() => {
+        if (user && user.rol === 'empresa') {
+            cargarCitas();
+        }
+    }, [user]);
+
+    const cargarCitas = async () => {
+        try {
+            const res = await api.get('/citas', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCitas(res.data);
+        } catch (err) {
+            setMensaje('Error al cargar las citas.');
+        }
     };
 
-    fetchCitas();
-  }, []);
+    const filtrarCitas = () => {
+        return citas.filter((cita) => {
+            return (
+                (!filtroFecha || cita.fecha_cita.includes(filtroFecha)) &&
+                (!filtroServicio || cita.servicio?.nombre.includes(filtroServicio))
+            );
+        });
+    };
 
-  const fechasConCitas = citas.map(c => c.fecha_cita);
+    const handleActualizarEstado = async (id, estado) => {
+        try {
+            await api.put(`/citas/${id}`, { estado }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            cargarCitas();
+            setMensaje('Cita actualizada correctamente.');
+        } catch (err) {
+            setMensaje('Error al actualizar la cita.');
+        }
+    };
 
-  const tileClassName = ({ date, view }) => {
-    if (view === 'month') {
-      const fechaStr = date.toISOString().split('T')[0];
-      return fechasConCitas.includes(fechaStr) ? 'marcada' : null;
-    }
-  };
+    return (
+        <div className="calendario-empresa">
+            <h2>Calendario de Citas</h2>
+            <div className="filtros">
+                <input 
+                    type="date" 
+                    value={filtroFecha} 
+                    onChange={(e) => setFiltroFecha(e.target.value)} 
+                    placeholder="Filtrar por fecha" 
+                />
+                <input 
+                    type="text" 
+                    value={filtroServicio} 
+                    onChange={(e) => setFiltroServicio(e.target.value)} 
+                    placeholder="Filtrar por servicio" 
+                />
+            </div>
 
-  const citasDelDia = citas.filter(c =>
-    c.fecha_cita === fechaSeleccionada.toISOString().split('T')[0]
-  );
-
-  const exportarCSV = () => {
-    const citasCSV = citas.map(c => ({
-      Fecha: c.fecha_cita,
-      Servicio: c.servicio?.nombre || '',
-      Cliente_ID: c.cliente_id,
-      Estado: c.estado
-    }));
-    exportCSV('citas_empresa', citasCSV);
-  };
-
-  return (
-    <div>
-      <h4>Calendario de citas</h4>
-      <button onClick={exportarCSV}>Exportar citas en CSV</button>
-
-      <Calendar
-        onChange={setFechaSeleccionada}
-        value={fechaSeleccionada}
-        tileClassName={tileClassName}
-      />
-
-      <h5>Citas del {fechaSeleccionada.toISOString().split('T')[0]}</h5>
-      {citasDelDia.length === 0 ? (
-        <p>No hay citas.</p>
-      ) : (
-        <ul>
-          {citasDelDia.map(c => (
-            <li key={c.id}>
-              {c.servicio?.nombre} - Cliente #{c.cliente_id} - Estado: {c.estado}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+            <ul className="citas-lista">
+                {filtrarCitas().length > 0 ? (
+                    filtrarCitas().map((cita) => (
+                        <li key={cita.id} className="cita-item">
+                            <strong>Cliente:</strong> {cita.cliente?.nombre || 'Anónimo'} <br />
+                            <strong>Servicio:</strong> {cita.servicio?.nombre} <br />
+                            <strong>Fecha:</strong> {cita.fecha_cita} <br />
+                            <strong>Estado:</strong> {cita.estado} <br />
+                            <button 
+                                onClick={() => handleActualizarEstado(cita.id, 'aceptada')} 
+                                className="aceptar-btn">
+                                Aceptar
+                            </button>
+                            <button 
+                                onClick={() => handleActualizarEstado(cita.id, 'rechazada')} 
+                                className="rechazar-btn">
+                                Rechazar
+                            </button>
+                        </li>
+                    ))
+                ) : (
+                    <p>No tienes citas registradas.</p>
+                )}
+            </ul>
+            {mensaje && <p>{mensaje}</p>}
+        </div>
+    );
 }
