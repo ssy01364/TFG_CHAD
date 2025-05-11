@@ -8,29 +8,18 @@ use Illuminate\Support\Facades\Auth;
 
 class CitaController extends Controller
 {
-    // Listar citas del usuario autenticado
+    // Listar citas (Clientes y Empresas)
     public function index()
     {
         $user = Auth::user();
-
-        // Verificar si es cliente
         if ($user->rol === 'cliente') {
-            return Cita::with('empresa', 'servicio')
-                ->where('cliente_id', $user->id)
-                ->get();
+            return Cita::where('cliente_id', $user->id)->get();
+        } else {
+            return Cita::where('empresa_id', $user->id)->with('cliente', 'servicio')->get();
         }
-
-        // Verificar si es empresa
-        if ($user->rol === 'empresa') {
-            return Cita::with('cliente', 'servicio')
-                ->where('empresa_id', $user->empresa->id)
-                ->get();
-        }
-
-        return response()->json(['message' => 'No tienes acceso a esta sección.'], 403);
     }
 
-    // Crear nueva cita (solo para clientes)
+    // Crear una nueva cita (Clientes)
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -41,7 +30,7 @@ class CitaController extends Controller
         $request->validate([
             'empresa_id' => 'required|exists:empresas,id',
             'servicio_id' => 'required|exists:servicios,id',
-            'fecha_cita' => 'required|date',
+            'fecha_cita' => 'required|date'
         ]);
 
         $cita = Cita::create([
@@ -49,40 +38,33 @@ class CitaController extends Controller
             'empresa_id' => $request->empresa_id,
             'servicio_id' => $request->servicio_id,
             'fecha_cita' => $request->fecha_cita,
-            'estado' => 'pendiente',
+            'estado' => 'pendiente'
         ]);
 
         return response()->json(['message' => 'Cita reservada correctamente.', 'cita' => $cita]);
     }
 
-    // Actualizar estado de la cita (solo para empresa)
+    // Actualizar estado de la cita (Empresas)
     public function update(Request $request, Cita $cita)
     {
         $user = Auth::user();
-        if ($user->rol !== 'empresa' || $cita->empresa_id !== $user->empresa->id) {
+        if ($user->rol !== 'empresa' || $cita->empresa_id !== $user->id) {
             return response()->json(['message' => 'No tienes permiso para actualizar esta cita.'], 403);
         }
 
-        $request->validate([
-            'estado' => 'required|in:pendiente,aceptada,rechazada'
-        ]);
-
-        $cita->update([
-            'estado' => $request->estado
-        ]);
-
-        return response()->json(['message' => 'Estado de la cita actualizado.', 'cita' => $cita]);
+        $cita->update(['estado' => $request->estado]);
+        return response()->json(['message' => 'Cita actualizada correctamente.']);
     }
 
-    // Cancelar cita (solo para clientes)
+    // Eliminar cita (Clientes)
     public function destroy(Cita $cita)
     {
         $user = Auth::user();
         if ($user->rol !== 'cliente' || $cita->cliente_id !== $user->id) {
-            return response()->json(['message' => 'No tienes permiso para cancelar esta cita.'], 403);
+            return response()->json(['message' => 'No tienes permiso para eliminar esta cita.'], 403);
         }
 
         $cita->delete();
-        return response()->json(['message' => 'Cita cancelada correctamente.']);
+        return response()->json(['message' => 'Cita eliminada correctamente.']);
     }
 }

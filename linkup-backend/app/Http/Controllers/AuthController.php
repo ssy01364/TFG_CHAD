@@ -9,70 +9,110 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Registro de Usuarios
+    // ✅ Registro de usuario
     public function register(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email',
-            'password' => 'required|min:6',
+            'password' => 'required|string|min:6',
             'rol' => 'required|in:cliente,empresa'
         ]);
 
-        $user = Usuario::create([
-            'nombre' => $request->nombre,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'rol' => $request->rol,
-        ]);
+        try {
+            $usuario = Usuario::create([
+                'nombre' => $request->nombre,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'rol' => $request->rol
+            ]);
 
-        return response()->json(['user' => $user, 'message' => 'Usuario registrado correctamente.'], 201);
+            $token = $usuario->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'user' => $usuario, 
+                'token' => $token
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al registrar usuario.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    // Inicio de sesión
+    // ✅ Inicio de sesión
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Credenciales incorrectas.'], 401);
+        $usuario = Usuario::where('email', $request->email)->first();
+
+        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('API Token')->plainTextToken;
+        $token = $usuario->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->json([
+            'user' => $usuario, 
+            'token' => $token
+        ], 200);
     }
 
-    // Cierre de sesión
-    public function logout()
+    // ✅ Cerrar sesión
+    public function logout(Request $request)
     {
-        Auth::user()->tokens()->delete();
-        return response()->json(['message' => 'Sesión cerrada correctamente.']);
+        try {
+            $request->user()->tokens()->delete();
+            return response()->json(['message' => 'Cierre de sesión exitoso'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al cerrar sesión.'], 500);
+        }
     }
 
-    // Actualizar perfil del usuario
+    // ✅ Obtener usuario autenticado
+    public function getUser(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()->only('id', 'nombre', 'email', 'rol')
+        ], 200);
+    }
+
+    // ✅ Actualizar perfil del usuario
     public function updateProfile(Request $request)
     {
-        $user = auth()->user();
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'email' => 'required|email|unique:usuarios,email,' . $user->id,
+            'email' => 'required|email|unique:usuarios,email,' . $request->user()->id
         ]);
 
-        $user->update([
-            'nombre' => $request->nombre,
-            'email' => $request->email,
-        ]);
+        try {
+            $user = $request->user();
+            $user->update($request->only('nombre', 'email'));
 
-        return response()->json(['message' => 'Perfil actualizado correctamente.']);
+            return response()->json([
+                'message' => 'Perfil actualizado correctamente', 
+                'user' => $user->only('id', 'nombre', 'email')
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al actualizar perfil.'], 500);
+        }
     }
 
-    // Eliminar cuenta del usuario
-    public function deleteAccount()
+    // ✅ Eliminar cuenta del usuario
+    public function deleteAccount(Request $request)
     {
-        $user = auth()->user();
-        $user->delete();
-        return response()->json(['message' => 'Cuenta eliminada correctamente.']);
+        try {
+            $user = $request->user();
+            $user->tokens()->delete(); // Eliminar todos los tokens del usuario
+            $user->delete();
+            return response()->json(['message' => 'Cuenta eliminada correctamente.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al eliminar la cuenta.'], 500);
+        }
     }
 }

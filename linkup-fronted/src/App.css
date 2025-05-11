@@ -1,13 +1,23 @@
-/* 🔧 Estilos Generales */
+/* src/App.css */
+
+/* 🔧 Configuración Global */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
 }
 
-/* 🔧 Estilos del Navbar */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* 🔧 Navbar (Barra de Navegación) */
 .navbar {
     width: 100%;
     background: #4B0082;
@@ -16,147 +26,138 @@ body {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.navbar-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.navbar-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+.navbar a {
     color: #fff;
     text-decoration: none;
+    margin-right: 1rem;
+    transition: color 0.3s;
 }
 
-.navbar-links {
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
+.navbar a:hover {
+    color: #ddd;
 }
 
-.navbar-links a,
-.navbar-links button {
+/* 🔧 Dark Mode (Modo Oscuro) */
+body.dark-mode {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .navbar {
+    background: #2c2c54;
+}
+
+body.dark-mode a {
+    color: #e0e0e0;
+}
+
+/* 🔧 Botón de Modo Oscuro */
+.dark-mode-toggle {
+    background: #4B0082;
     color: #fff;
-    background: none;
     border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    text-decoration: none;
     padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
     transition: background 0.3s;
 }
 
-.navbar-links a:hover,
-.navbar-links button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
+.dark-mode-toggle:hover {
+    background: #5E239D;
 }
 
-.logout-btn {
-    background: #E53E3E;
+/* 🔧 Mensajes Globales */
+.mensaje {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    background-color: #28A745;
     color: #fff;
-    padding: 0.4rem 0.8rem;
+}
+
+.mensaje.error {
+    background-color: #E53E3E;
+}
+
+/* 🔧 Formularios Globales */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input,
+form textarea,
+form select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+    width: 100%;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #4B0082;
+}
+
+/* 🔧 Botones Globales */
+button {
+    padding: 0.75rem;
+    background: #4B0082;
+    color: #fff;
     border: none;
     cursor: pointer;
     border-radius: 4px;
     transition: background 0.3s;
 }
 
-.logout-btn:hover {
+button:hover {
+    background: #5E239D;
+}
+
+button.danger {
+    background: #E53E3E;
+}
+
+button.danger:hover {
     background: #C53030;
 }
 
-/* 🔧 Estilos del Formulario de Autenticación (Login y Registro) */
-.auth-form {
-    max-width: 400px;
-    margin: 2rem auto;
+/* 🔧 Listas Globales */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* 🔧 Tarjetas (Cards) */
+.card {
+    background: #ffffff;
     padding: 1rem;
-    background: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
 }
 
-.auth-form h2 {
-    text-align: center;
-    color: #4B0082;
-}
-
-.auth-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.auth-form input,
-.auth-form select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.auth-form button {
-    padding: 0.5rem;
-    background: #4B0082;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s;
-}
-
-.auth-form button:hover {
-    background: #5E239D;
-}
-
-.auth-form p {
-    color: #E53E3E;
-    text-align: center;
-}
-
-/* 🔧 Estilos del Panel de Empresa */
-.panel-empresa {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.panel-empresa h2 {
-    text-align: center;
-    color: #4B0082;
-}
-
-.panel-empresa form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.panel-empresa input,
-.panel-empresa textarea {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.panel-empresa button {
-    padding: 0.5rem;
-    background: #4B0082;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.panel-empresa button:hover {
-    background: #5E239D;
+.card:hover {
+    transform: translateY(-4px);
 }

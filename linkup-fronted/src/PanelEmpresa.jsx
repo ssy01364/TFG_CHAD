@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import axios from './api';
 import { useNavigate } from 'react-router-dom';
+import './styles/PanelEmpresa.css'; // Asegúrate de tener este archivo de CSS
 
 export default function PanelEmpresa() {
     const { user } = useContext(AuthContext);
@@ -12,6 +13,8 @@ export default function PanelEmpresa() {
     const [descripcion, setDescripcion] = useState('');
     const [precio, setPrecio] = useState('');
     const [editingServicio, setEditingServicio] = useState(null);
+    const [mensaje, setMensaje] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user && user.rol === 'empresa') {
@@ -22,16 +25,22 @@ export default function PanelEmpresa() {
     }, [user, navigate]);
 
     const loadServicios = async () => {
+        setLoading(true);
         try {
             const res = await axios.get(`/empresas/${user.empresa_id}/servicios`);
-            setServicios(res.data.servicios);
+            setServicios(res.data.servicios || []);
         } catch (error) {
             console.error("Error al cargar servicios:", error);
+            setMensaje("❌ Error al cargar los servicios.");
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMensaje('');
+        setLoading(true);
         try {
             if (editingServicio) {
                 await axios.put(`/servicios/${editingServicio.id}`, {
@@ -39,20 +48,23 @@ export default function PanelEmpresa() {
                     descripcion,
                     precio
                 });
-                alert("Servicio actualizado correctamente.");
+                setMensaje("✅ Servicio actualizado correctamente.");
             } else {
                 await axios.post('/servicios', {
                     nombre: nombreServicio,
                     descripcion,
                     precio
                 });
-                alert("Servicio creado correctamente.");
+                setMensaje("✅ Servicio creado correctamente.");
             }
 
             resetForm();
             loadServicios();
         } catch (error) {
             console.error("Error al gestionar servicio:", error);
+            setMensaje("❌ Hubo un problema al gestionar el servicio.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -67,10 +79,11 @@ export default function PanelEmpresa() {
         if (window.confirm("¿Estás seguro de que deseas eliminar este servicio?")) {
             try {
                 await axios.delete(`/servicios/${id}`);
-                alert("Servicio eliminado correctamente.");
+                setMensaje("✅ Servicio eliminado correctamente.");
                 loadServicios();
             } catch (error) {
                 console.error("Error al eliminar servicio:", error);
+                setMensaje("❌ Error al eliminar el servicio.");
             }
         }
     };
@@ -86,7 +99,7 @@ export default function PanelEmpresa() {
         <div className="panel-empresa">
             <h2>Panel de Empresa</h2>
             <h3>Gestionar Servicios</h3>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="servicio-form">
                 <input
                     type="text"
                     placeholder="Nombre del servicio"
@@ -106,15 +119,19 @@ export default function PanelEmpresa() {
                     onChange={(e) => setPrecio(e.target.value)}
                     required
                 />
-                <button type="submit">
-                    {editingServicio ? "Actualizar Servicio" : "Agregar Servicio"}
-                </button>
-                {editingServicio && (
-                    <button type="button" onClick={resetForm} className="cancel-btn">
-                        Cancelar Edición
+                <div className="form-actions">
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Guardando..." : editingServicio ? "Actualizar Servicio" : "Agregar Servicio"}
                     </button>
-                )}
+                    {editingServicio && (
+                        <button type="button" onClick={resetForm} className="cancel-btn">
+                            Cancelar Edición
+                        </button>
+                    )}
+                </div>
             </form>
+
+            {mensaje && <p className="mensaje">{mensaje}</p>}
 
             <h3>Mis Servicios</h3>
             <ul className="servicios-lista">
@@ -123,10 +140,12 @@ export default function PanelEmpresa() {
                         <li key={servicio.id} className="servicio-item">
                             <strong>{servicio.nombre}</strong> - ${servicio.precio}
                             <p>{servicio.descripcion}</p>
-                            <button onClick={() => handleEdit(servicio)}>Editar</button>
-                            <button onClick={() => handleDelete(servicio.id)} className="delete-btn">
-                                Eliminar
-                            </button>
+                            <div className="servicio-actions">
+                                <button onClick={() => handleEdit(servicio)}>Editar</button>
+                                <button onClick={() => handleDelete(servicio.id)} className="delete-btn">
+                                    Eliminar
+                                </button>
+                            </div>
                         </li>
                     ))
                 ) : (

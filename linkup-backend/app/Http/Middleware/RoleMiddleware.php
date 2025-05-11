@@ -13,18 +13,23 @@ class RoleMiddleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $role
+     * @param  mixed  ...$roles
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         $user = Auth::user();
         
-        if (!$user || $user->rol !== $role) {
+        // Verificar si el usuario está autenticado
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado. Inicia sesión.'], 401);
+        }
+
+        // Verificar si el usuario tiene alguno de los roles permitidos
+        if (!in_array($user->rol, $roles)) {
             return response()->json(['message' => 'Acceso denegado. No tienes el rol adecuado.'], 403);
         }
 
         return $next($request);
     }
 }
-

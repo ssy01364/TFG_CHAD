@@ -9,6 +9,7 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '' });
     const [mensaje, setMensaje] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,12 +17,28 @@ export default function LoginForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setMensaje('');
+        
         try {
             const res = await api.post('/login', form);
             login(res.data.user, res.data.token);
+            setForm({ email: '', password: '' });
             navigate('/');
         } catch (err) {
-            setMensaje('Credenciales incorrectas');
+            if (err.response) {
+                if (err.response.status === 401) {
+                    setMensaje('Correo electrónico o contraseña incorrectos.');
+                } else if (err.response.status === 500) {
+                    setMensaje('Error del servidor. Intenta nuevamente más tarde.');
+                } else {
+                    setMensaje('Error desconocido. Verifica tus datos.');
+                }
+            } else {
+                setMensaje('No se pudo conectar al servidor.');
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -45,9 +62,11 @@ export default function LoginForm() {
                     onChange={handleChange} 
                     required 
                 />
-                <button type="submit">Login</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? "Cargando..." : "Login"}
+                </button>
             </form>
-            {mensaje && <p>{mensaje}</p>}
+            {mensaje && <p className="error-message">{mensaje}</p>}
         </div>
     );
 }

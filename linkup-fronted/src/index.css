@@ -1,43 +1,44 @@
+/* src/index.css */
+
 /* 🔧 Reset de Estilos (Normalize CSS) */
-* {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 html, body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
     color: #333;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-}
-
-/* 🔧 Variables de Color y Tipografía Globales */
-:root {
-    --primary-color: #4B0082;
-    --secondary-color: #5E239D;
-    --danger-color: #E53E3E;
-    --success-color: #28A745;
-    --text-color: #333;
-    --background-color: #f4f4f4;
-    --font-family: 'Arial', sans-serif;
-    --font-size-base: 16px;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
 }
 
 /* 🔧 Configuración Global de Enlaces */
 a {
     text-decoration: none;
-    color: var(--primary-color);
+    color: #4B0082;
     transition: color 0.3s;
 }
 
 a:hover {
-    color: var(--secondary-color);
+    color: #5E239D;
 }
 
-/* 🔧 Clases Utilitarias Globales */
+/* 🔧 Contenedor Principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* 🔧 Clases Utilitarias */
 .text-center {
     text-align: center;
 }
@@ -61,54 +62,24 @@ a:hover {
     align-items: center;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-/* 🔧 Estilos para Botones Globales */
-button {
-    cursor: pointer;
-    font-family: var(--font-family);
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    transition: background 0.3s;
+/* 🔧 Dark Mode (Modo Oscuro) */
+body.dark-mode {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
 }
 
-button.primary {
-    background: var(--primary-color);
-    color: #fff;
+body.dark-mode a {
+    color: #e0e0e0;
 }
 
-button.primary:hover {
-    background: var(--secondary-color);
-}
-
-button.danger {
-    background: var(--danger-color);
-    color: #fff;
-}
-
-button.danger:hover {
-    background: #C53030;
-}
-
-/* 🔧 Configuración Global para Inputs y Textareas */
-input, textarea, select {
-    font-family: var(--font-family);
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: border 0.3s;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-input:focus, 
-textarea:focus, 
-select:focus {
-    border-color: var(--primary-color);
-    outline: none;
+body.dark-mode .card {
+    background-color: #2c2c54;
+    border-color: #444;
+    color: #e0e0e0;
 }

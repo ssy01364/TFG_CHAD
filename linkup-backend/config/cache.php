@@ -9,49 +9,58 @@ return [
     | Default Cache Store
     |--------------------------------------------------------------------------
     |
-    | This option controls the default cache store that will be used by the
-    | framework. This connection is utilized if another isn't explicitly
-    | specified when running a cache operation inside the application.
+    | Este valor controla el almacenamiento de caché predeterminado que se 
+    | utilizará en tu aplicación. Puedes cambiar este valor a "file", 
+    | "database", "redis", entre otros.
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => env('CACHE_DRIVER', 'file'),
 
     /*
     |--------------------------------------------------------------------------
-    | Cache Stores
+    | Cache Stores (Almacenamientos de Cache)
     |--------------------------------------------------------------------------
     |
-    | Here you may define all of the cache "stores" for your application as
-    | well as their drivers. You may even define multiple stores for the
-    | same cache driver to group types of items stored in your caches.
+    | Aquí puedes definir todos los "stores" de caché que tu aplicación 
+    | utilizará. Cada driver representa un método diferente de almacenamiento 
+    | de caché (archivo, base de datos, redis, etc).
     |
-    | Supported drivers: "array", "database", "file", "memcached",
-    |                    "redis", "dynamodb", "octane", "null"
+    | Drivers soportados: "array", "database", "file", "memcached",
+    |                     "redis", "dynamodb", "octane", "null"
     |
     */
 
     'stores' => [
 
+        // ✅ Almacenamiento en Archivo (File)
+        'file' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/data'),
+        ],
+
+        // ✅ Almacenamiento en Base de Datos (Database)
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_CONNECTION', 'mysql'),
+            'table' => 'cache',
+            'lock_connection' => env('DB_CONNECTION', 'mysql'),
+        ],
+
+        // ✅ Almacenamiento en Memoria (Array) - Solo para Pruebas
         'array' => [
             'driver' => 'array',
             'serialize' => false,
         ],
 
-        'database' => [
-            'driver' => 'database',
-            'connection' => env('DB_CACHE_CONNECTION'),
-            'table' => env('DB_CACHE_TABLE', 'cache'),
-            'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
-            'lock_table' => env('DB_CACHE_LOCK_TABLE'),
+        // ✅ Almacenamiento en Redis (Cache Rápido)
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
+            'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
         ],
 
-        'file' => [
-            'driver' => 'file',
-            'path' => storage_path('framework/cache/data'),
-            'lock_path' => storage_path('framework/cache/data'),
-        ],
-
+        // ✅ Almacenamiento en Memcached (Cache Distribuido)
         'memcached' => [
             'driver' => 'memcached',
             'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
@@ -60,7 +69,7 @@ return [
                 env('MEMCACHED_PASSWORD'),
             ],
             'options' => [
-                // Memcached::OPT_CONNECT_TIMEOUT => 2000,
+                // Opciones de Memcached
             ],
             'servers' => [
                 [
@@ -71,12 +80,7 @@ return [
             ],
         ],
 
-        'redis' => [
-            'driver' => 'redis',
-            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
-            'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
-        ],
-
+        // ✅ Almacenamiento en DynamoDB (AWS)
         'dynamodb' => [
             'driver' => 'dynamodb',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -86,6 +90,7 @@ return [
             'endpoint' => env('DYNAMODB_ENDPOINT'),
         ],
 
+        // ✅ Almacenamiento para Laravel Octane (Alto Rendimiento)
         'octane' => [
             'driver' => 'octane',
         ],
@@ -94,12 +99,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Cache Key Prefix
+    | Cache Key Prefix (Prefijo de Cache)
     |--------------------------------------------------------------------------
     |
-    | When utilizing the APC, database, memcached, Redis, and DynamoDB cache
-    | stores, there might be other applications using the same cache. For
-    | that reason, you may prefix every cache key to avoid collisions.
+    | Este prefijo se aplica a todas las claves de caché para evitar 
+    | conflictos si tienes múltiples aplicaciones usando la misma cache.
     |
     */
 

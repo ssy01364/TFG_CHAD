@@ -1,5 +1,5 @@
 // src/App.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import LoginForm from './LoginForm';
@@ -14,13 +14,33 @@ import CitaForm from './CitaForm';
 import EmpresaForm from './EmpresaForm';
 import Navbar from './Navbar';
 import ProtectedRoute from './ProtectedRoute';
+import './App.css'; // Asegúrate de tener este archivo CSS
 
 export default function App() {
+    const [darkMode, setDarkMode] = useState(false);
+
+    useEffect(() => {
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode) {
+            setDarkMode(JSON.parse(savedMode));
+            document.body.classList.toggle('dark-mode', JSON.parse(savedMode));
+        }
+    }, []);
+
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+        document.body.classList.toggle('dark-mode', !darkMode);
+        localStorage.setItem('darkMode', JSON.stringify(!darkMode));
+    };
+
     return (
         <AuthProvider>
             <Router>
                 <Navbar />
                 <div className="container">
+                    <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+                        {darkMode ? "🌙 Modo Oscuro" : "🌞 Modo Claro"}
+                    </button>
                     <Routes>
                         {/* Rutas Públicas */}
                         <Route path="/login" element={<LoginForm />} />

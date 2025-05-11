@@ -1,0 +1,61 @@
+/* src/RegisterForm.css */
+
+/* 🔧 Estilos del Formulario de Registro */
+.auth-form {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form h2 {
+    text-align: center;
+    color: #4B0082;
+    margin-bottom: 1rem;
+}
+
+.auth-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.auth-form input,
+.auth-form select {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+    outline: none;
+    border-color: #4B0082;
+}
+
+.auth-form button {
+    padding: 0.75rem;
+    background: #4B0082;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.auth-form button:hover {
+    background: #5E239D;
+}
+
+.auth-form p.mensaje {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #E53E3E;
+}

@@ -1,0 +1,102 @@
+/* src/PanelEmpresa.css */
+
+/* 🔧 Estilos del Panel de Empresa */
+.panel-empresa {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.panel-empresa h2 {
+    text-align: center;
+    color: #4B0082;
+    margin-bottom: 1rem;
+}
+
+.servicio-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.servicio-form input,
+.servicio-form textarea {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+.servicio-form input:focus,
+.servicio-form textarea:focus {
+    outline: none;
+    border-color: #4B0082;
+}
+
+.servicio-form button {
+    background: #4B0082;
+    color: #fff;
+    padding: 0.75rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.servicio-form button:hover {
+    background: #5E239D;
+}
+
+.servicios-lista {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.servicio-item {
+    background: #ffffff;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.servicio-item strong {
+    color: #333;
+}
+
+.servicio-item button {
+    background: #E53E3E;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.servicio-item button:hover {
+    background: #C53030;
+}
+
+.mensaje {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+.mensaje.success {
+    color: #28A745;
+}
+
+.mensaje.error {
+    color: #E53E3E;
+}

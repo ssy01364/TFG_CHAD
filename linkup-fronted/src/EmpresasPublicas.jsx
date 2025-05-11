@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from './api';
 import { useNavigate } from 'react-router-dom';
+import './styles/EmpresasPublicas.css'; // Asegúrate de crear este archivo de CSS
 
 export default function EmpresasPublicas() {
     const [empresas, setEmpresas] = useState([]);
     const [search, setSearch] = useState('');
+    const [mensaje, setMensaje] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,6 +20,7 @@ export default function EmpresasPublicas() {
             setEmpresas(res.data);
         } catch (error) {
             console.error("Error al cargar empresas:", error);
+            setMensaje("Error al cargar las empresas. Intenta nuevamente.");
         }
     };
 
@@ -41,21 +44,24 @@ export default function EmpresasPublicas() {
                 className="search-input"
             />
 
+            {mensaje && <p className="error-message">{mensaje}</p>}
+
             <ul className="empresas-lista">
                 {filteredEmpresas.length > 0 ? (
                     filteredEmpresas.map((empresa) => (
                         <li key={empresa.id} className="empresa-item">
                             <h3>{empresa.nombre}</h3>
                             <p><strong>Sector:</strong> {empresa.sector}</p>
-                            <p><strong>Descripción:</strong> {empresa.descripcion}</p>
+                            <p><strong>Descripción:</strong> {empresa.descripcion || "Sin descripción"}</p>
 
-                            <h4>Servicios</h4>
-                            <ul>
-                                {empresa.servicios.length > 0 ? (
+                            <h4>Servicios Disponibles</h4>
+                            <ul className="servicios-lista">
+                                {empresa.servicios && empresa.servicios.length > 0 ? (
                                     empresa.servicios.map((servicio) => (
-                                        <li key={servicio.id}>
-                                            <strong>{servicio.nombre}</strong> - ${servicio.precio}
+                                        <li key={servicio.id} className="servicio-item">
+                                            <span><strong>{servicio.nombre}</strong> - ${servicio.precio}</span>
                                             <button 
+                                                className="reservar-btn" 
                                                 onClick={() => reservarCita(empresa.id, servicio.id)}>
                                                 Reservar
                                             </button>

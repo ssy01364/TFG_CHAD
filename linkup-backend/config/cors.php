@@ -4,28 +4,57 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | CORS Configuration
+    | Rutas Permitidas para CORS
     |--------------------------------------------------------------------------
-    |
-    | Esta configuración controla las políticas de CORS de tu aplicación.
-    | Puedes ajustar los orígenes permitidos, métodos, encabezados y más.
-    |
     */
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'], // Permitir todas las rutas de la API y CSRF de Sanctum
+    /*
+    |--------------------------------------------------------------------------
+    | Métodos Permitidos para CORS
+    |--------------------------------------------------------------------------
+    */
+    'allowed_methods' => ['*'],
 
-    'allowed_methods' => ['*'], // Permitir todos los métodos (GET, POST, PUT, DELETE, etc.)
+    /*
+    |--------------------------------------------------------------------------
+    | Orígenes Permitidos (Frontend)
+    |--------------------------------------------------------------------------
+    */
+    'allowed_origins' => ['http://localhost:3000'],
 
-    'allowed_origins' => ['*'], // Permitir todos los orígenes (Cambiar a 'http://localhost:3000' en producción)
-
+    /*
+    |--------------------------------------------------------------------------
+    | Patrones de Orígenes Permitidos
+    |--------------------------------------------------------------------------
+    */
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'], // Permitir todos los encabezados
+    /*
+    |--------------------------------------------------------------------------
+    | Headers Permitidos
+    |--------------------------------------------------------------------------
+    */
+    'allowed_headers' => ['*'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Headers Expuestos
+    |--------------------------------------------------------------------------
+    */
     'exposed_headers' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Duración Máxima
+    |--------------------------------------------------------------------------
+    */
     'max_age' => 0,
 
-    'supports_credentials' => true, // Habilitar credenciales (necesario para Sanctum)
-
+    /*
+    |--------------------------------------------------------------------------
+    | Habilitar Credenciales (Cookies)
+    |--------------------------------------------------------------------------
+    */
+    'supports_credentials' => true,
 ];

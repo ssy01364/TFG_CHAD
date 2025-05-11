@@ -1,0 +1,75 @@
+/* src/EmpresasPublicas.css */
+
+/* Estilos Generales */
+.empresas-publicas {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.empresas-publicas h2 {
+    text-align: center;
+    color: #4B0082;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.error-message {
+    color: #E53E3E;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.empresas-lista {
+    list-style: none;
+    padding: 0;
+}
+
+.empresa-item {
+    background: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.empresa-item h3 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.servicios-lista {
+    list-style: none;
+    padding: 0;
+}
+
+.servicio-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-top: 1px solid #eee;
+}
+
+.reservar-btn {
+    background: #4B0082;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.reservar-btn:hover {
+    background: #5E239D;
+}
