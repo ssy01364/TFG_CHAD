@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import api from './api';
 
 export default function EmpresaForm() {
-    const { user } = useContext(AuthContext);
+    const { user, token } = useContext(AuthContext);
     const navigate = useNavigate();
     const [nombre, setNombre] = useState('');
     const [sector, setSector] = useState('');
@@ -13,7 +13,6 @@ export default function EmpresaForm() {
     const [ubicacion, setUbicacion] = useState('');
     const [telefono, setTelefono] = useState('');
     const [mensaje, setMensaje] = useState('');
-    const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
@@ -24,31 +23,25 @@ export default function EmpresaForm() {
 
     const cargarEmpresa = async () => {
         try {
-            const res = await api.get('/empresas', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            const res = await api.get(`/empresas/${user.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            if (res.data.length > 0) {
-                const empresa = res.data.find(e => e.usuario_id === user.id);
-                if (empresa) {
-                    setNombre(empresa.nombre);
-                    setSector(empresa.sector);
-                    setDescripcion(empresa.descripcion);
-                    setUbicacion(empresa.ubicacion);
-                    setTelefono(empresa.telefono);
-                    setIsEditing(true);
-                }
+            if (res.data) {
+                const empresa = res.data;
+                setNombre(empresa.nombre);
+                setSector(empresa.sector);
+                setDescripcion(empresa.descripcion);
+                setUbicacion(empresa.ubicacion);
+                setTelefono(empresa.telefono);
+                setIsEditing(true);
             }
         } catch (err) {
-            console.error("Error al cargar la empresa:", err);
-            setMensaje("Error al cargar la empresa.");
+            setMensaje("❌ Error al cargar la empresa.");
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setMensaje('');
-
         try {
             if (isEditing) {
                 await api.put(`/empresas/${user.id}`, {
@@ -58,9 +51,9 @@ export default function EmpresaForm() {
                     ubicacion,
                     telefono
                 }, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
-                setMensaje("Empresa actualizada correctamente.");
+                setMensaje("✅ Empresa actualizada correctamente.");
             } else {
                 await api.post('/empresas', {
                     nombre,
@@ -70,25 +63,13 @@ export default function EmpresaForm() {
                     telefono,
                     usuario_id: user.id
                 }, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
-                setMensaje("Empresa registrada correctamente.");
+                setMensaje("✅ Empresa registrada correctamente.");
+                navigate('/panel-empresa');
             }
-            navigate('/panel-empresa');
         } catch (err) {
-            if (err.response) {
-                if (err.response.status === 403) {
-                    setMensaje("No tienes permisos para realizar esta acción.");
-                } else if (err.response.status === 400) {
-                    setMensaje("Ya tienes una empresa registrada.");
-                } else {
-                    setMensaje("Error al guardar la empresa.");
-                }
-            } else {
-                setMensaje("Error de conexión. Verifica tu red.");
-            }
-        } finally {
-            setLoading(false);
+            setMensaje("❌ Error al registrar la empresa.");
         }
     };
 
@@ -132,11 +113,11 @@ export default function EmpresaForm() {
                     onChange={(e) => setTelefono(e.target.value)} 
                 />
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Guardando..." : isEditing ? "Actualizar Empresa" : "Registrar Empresa"}
+                <button type="submit">
+                    {isEditing ? "Actualizar Empresa" : "Registrar Empresa"}
                 </button>
             </form>
-            {mensaje && <p className="mensaje">{mensaje}</p>}
+            {mensaje && <p className={mensaje.includes("❌") ? "mensaje error" : "mensaje success"}>{mensaje}</p>}
         </div>
     );
 }

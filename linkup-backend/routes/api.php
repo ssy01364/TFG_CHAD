@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -11,7 +11,7 @@ use App\Http\Controllers\ReseñaController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// ✅ Rutas Protegidas (Requieren Autenticación)
+// ✅ Rutas Protegidas (Requieren Autenticación con Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     
     // ✅ Cerrar sesión
@@ -22,20 +22,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/usuario', [AuthController::class, 'updateProfile']);
     Route::delete('/usuario', [AuthController::class, 'deleteAccount']);
 
-    // ✅ Rutas Protegidas para Empresas
+    // ✅ Rutas Protegidas para Empresas (Solo Acceso Propio)
     Route::middleware('role:empresa')->group(function () {
-        // Gestión de Empresas
-        Route::get('/empresas', [EmpresaController::class, 'index']);
-        Route::post('/empresas', [EmpresaController::class, 'store']);
-        Route::get('/empresas/{empresa}', [EmpresaController::class, 'show']);
-        Route::put('/empresas/{empresa}', [EmpresaController::class, 'update']);
-        Route::delete('/empresas/{empresa}', [EmpresaController::class, 'destroy']);
+        // Gestión de Empresas (Solo su Propia Empresa)
+        Route::get('/empresas', [EmpresaController::class, 'index']); // Listar todas
+        Route::post('/empresas', [EmpresaController::class, 'store']); // Crear nueva
 
-        // Gestión de Servicios (solo para la empresa autenticada)
-        Route::get('/empresas/{empresa}/servicios', [ServicioController::class, 'index']);
+        // Solo el Propietario puede Modificar o Eliminar
+        Route::get('/empresas/{empresa}', [EmpresaController::class, 'show'])
+            ->middleware('can:manage,empresa');
+        Route::put('/empresas/{empresa}', [EmpresaController::class, 'update'])
+            ->middleware('can:manage,empresa');
+        Route::delete('/empresas/{empresa}', [EmpresaController::class, 'destroy'])
+            ->middleware('can:manage,empresa');
+
+        // ✅ Gestión de Servicios (Solo su Propio Servicio)
+        Route::get('/empresas/{empresa}/servicios', [ServicioController::class, 'index'])
+            ->middleware('can:manage,empresa');
         Route::post('/servicios', [ServicioController::class, 'store']);
-        Route::put('/servicios/{servicio}', [ServicioController::class, 'update']);
-        Route::delete('/servicios/{servicio}', [ServicioController::class, 'destroy']);
+        Route::put('/servicios/{servicio}', [ServicioController::class, 'update'])
+            ->middleware('can:manage,servicio');
+        Route::delete('/servicios/{servicio}', [ServicioController::class, 'destroy'])
+            ->middleware('can:manage,servicio');
     });
 
     // ✅ Rutas de Citas (Clientes y Empresas)
