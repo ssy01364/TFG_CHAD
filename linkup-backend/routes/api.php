@@ -11,6 +11,10 @@ use App\Http\Controllers\ReseñaController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// ✅ Rutas Públicas para Ver Empresas
+Route::get('/empresas', [EmpresaController::class, 'index']);
+Route::get('/empresas/{empresa}', [EmpresaController::class, 'show']);
+
 // ✅ Rutas Protegidas (Requieren Autenticación con Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     
@@ -22,15 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/usuario', [AuthController::class, 'updateProfile']);
     Route::delete('/usuario', [AuthController::class, 'deleteAccount']);
 
-    // ✅ Rutas Protegidas para Empresas (Solo Acceso Propio)
+    // ✅ Rutas Protegidas para Empresas (Solo Empresas)
     Route::middleware('role:empresa')->group(function () {
-        // Gestión de Empresas (Solo su Propia Empresa)
-        Route::get('/empresas', [EmpresaController::class, 'index']); // Listar todas
-        Route::post('/empresas', [EmpresaController::class, 'store']); // Crear nueva
+        // ✅ Registrar una Nueva Empresa (Solo Empresas)
+        Route::post('/empresas', [EmpresaController::class, 'store']);
 
-        // Solo el Propietario puede Modificar o Eliminar
-        Route::get('/empresas/{empresa}', [EmpresaController::class, 'show'])
-            ->middleware('can:manage,empresa');
+        // ✅ Gestión de Empresas (Solo su Propia Empresa)
         Route::put('/empresas/{empresa}', [EmpresaController::class, 'update'])
             ->middleware('can:manage,empresa');
         Route::delete('/empresas/{empresa}', [EmpresaController::class, 'destroy'])
